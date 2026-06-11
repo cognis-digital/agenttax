@@ -1,0 +1,35 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "cognis-agenttax"
+version = "0.1.0"
+description = "Classify findings against Microsoft's AI-agent threat taxonomy with mitigations"
+authors = [{name = "Cognis Digital", email = "suite@cognis.digital"}]
+license = {text = "LicenseRef-COCL-1.0"}
+requires-python = ">=3.10"
+readme = "README.md"
+keywords = ["ai-security", "cognis-digital", "cognis-neural-suite", "security", "agents", "mcp"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "License :: Other/Proprietary License",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+dependencies = []
+
+[project.optional-dependencies]
+mcp = ["mcp>=1.0"]
+dev = ["pytest>=8.0"]
+
+[project.urls]
+Homepage = "https://cognis.digital"
+Repository = "https://github.com/cognis-digital/agenttax"
+
+[project.scripts]
+agenttax = "agenttax.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["agenttax"]
