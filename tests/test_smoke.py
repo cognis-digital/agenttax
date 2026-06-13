@@ -4,7 +4,6 @@ import json
 import os
 import subprocess
 import sys
-import tempfile
 import unittest
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -13,7 +12,6 @@ from agenttax import TOOL_NAME, TOOL_VERSION
 from agenttax.cli import main
 from agenttax.core import (
     TAXONOMY,
-    classify_findings,
     classify_text,
     load_findings,
     normalize_findings,
