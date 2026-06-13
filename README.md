@@ -141,6 +141,12 @@ Point Cognis.Studio / Claude Desktop / Cursor at it as an MCP command server.
 python -m pytest -q          # or: python -m unittest discover -s tests -q
 ```
 
+## Interoperability
+
+`{}` composes with the 300+ tool Cognis suite — JSON in/out and a shared
+OpenAI-compatible `/v1` backbone. See **[INTEROP.md](INTEROP.md)** for the
+suite map, composition patterns, and reference stacks.
+
 ## License
 
 Cognis Open Collaboration License (COCL) v1.0 — source-available, free for
