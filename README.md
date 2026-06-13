@@ -11,6 +11,31 @@
 
 *AI Security & Governance — securing LLMs, agents, and the MCP supply chain.*
 
+## Usage — step by step
+
+1. **Install** the `agenttax` command (stdlib-only — you can also just run it with Python 3.10+):
+   ```bash
+   pip install cognis-agenttax   # or: pip install -e .
+   ```
+2. **Classify findings** against Microsoft's AI-agent threat taxonomy. Pass a findings JSON file (a list, or `{"findings":[...]}`), or use `--text` for a free-text blob:
+   ```bash
+   agenttax classify findings.json
+   agenttax classify --text "the agent followed instructions hidden in a fetched web page"
+   ```
+3. **Browse the taxonomy** itself (7 categories + concrete mitigations) when you need the reference:
+   ```bash
+   agenttax taxonomy
+   ```
+4. **Read / route the output** — `--format` is `table` (default), `json`, or `sarif`; `--min-confidence` drops weak matches and `--out` writes to a file:
+   ```bash
+   agenttax classify findings.json --format sarif --min-confidence 0.4 --out agenttax.sarif
+   ```
+5. **Gate CI** with `--fail-on` (`low|medium|high`), which exits non-zero when any match reaches that confidence band:
+   ```yaml
+   - run: pip install cognis-agenttax
+   - run: agenttax classify findings.json --fail-on high --format sarif --out agenttax.sarif
+   ```
+
 ## Why
 
 When you review an agentic AI system you produce findings — but raw findings
