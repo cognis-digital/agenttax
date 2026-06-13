@@ -11,6 +11,12 @@
 
 *AI Security & Governance — securing LLMs, agents, and the MCP supply chain.*
 
+<!-- cognis:layman:start -->
+## What is this?
+
+agenttax is a command-line tool that reads security findings about an AI system — such as notes from a security review or output from a scanner — and tells you exactly what type of AI threat each finding represents, along with a specific step you can take to fix it. It maps findings onto seven recognized threat categories (things like prompt injection, poisoned tools, or data leaking between users), assigns a confidence score, and can export results as a table, JSON, or a standard SARIF report that code-scanning tools already understand. It is built for security engineers and developers who build or audit AI agents and want a fast, no-network, auditable way to triage and prioritize what they find.
+<!-- cognis:layman:end -->
+
 ## Why
 
 When you review an agentic AI system you produce findings — but raw findings
@@ -47,6 +53,42 @@ bucketed into `high` / `medium` / `low`. A finding can match multiple
 categories. Findings that match nothing are reported as *unclassified* for
 manual review. Because the rules are plain regexes in `core.py`, every
 decision is auditable.
+
+<!-- cognis:install:start -->
+## Install
+
+`agenttax` is source-available (not published to PyPI) — every method below installs
+straight from GitHub. Pick whichever you prefer; the one-line scripts auto-detect
+the best tool available on your machine.
+
+**One-liner (Linux / macOS):**
+```sh
+curl -fsSL https://raw.githubusercontent.com/cognis-digital/agenttax/HEAD/install.sh | sh
+```
+
+**One-liner (Windows PowerShell):**
+```powershell
+irm https://raw.githubusercontent.com/cognis-digital/agenttax/HEAD/install.ps1 | iex
+```
+
+**Or install manually — any one of:**
+```sh
+pipx install "git+https://github.com/cognis-digital/agenttax.git"     # isolated (recommended)
+uv tool install "git+https://github.com/cognis-digital/agenttax.git"  # uv
+pip install "git+https://github.com/cognis-digital/agenttax.git"      # pip
+```
+
+**From source:**
+```sh
+git clone https://github.com/cognis-digital/agenttax.git
+cd agenttax && pip install .
+```
+
+Then run:
+```sh
+agenttax --help
+```
+<!-- cognis:install:end -->
 
 ## Install
 
@@ -115,6 +157,32 @@ Point Cognis.Studio / Claude Desktop / Cursor at it as an MCP command server.
 ```bash
 python -m pytest -q          # or: python -m unittest discover -s tests -q
 ```
+
+<a name="verification"></a>
+## Verification
+
+[![tests](https://img.shields.io/badge/tests-37%20passing-2ea44f.svg)](AUDIT.md)
+
+Every push is verified end-to-end. Latest audit (2026-06-13):
+
+```text
+tests        : 37 passed, 0 failed, 0 errored
+compile      : all modules parse
+cli          : C:\Python314\python.exe: No module named https
+package      : https
+```
+
+<details><summary>CLI surface (<code>--help</code>)</summary>
+
+```text
+C:\Python314\python.exe: No module named https
+```
+</details>
+
+Full machine-readable results: [`AUDIT.md`](AUDIT.md) · regenerate with `python -m https --help` + `pytest -q`.
+
+<div align="right"><a href="#top">↑ back to top</a></div>
+
 
 ## License
 

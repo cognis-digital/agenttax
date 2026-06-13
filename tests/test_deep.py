@@ -8,9 +8,6 @@ import unittest
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from agenttax.core import (
-    TAXONOMY,
-    Classification,
-    Report,
     classify_findings,
     classify_text,
     findings_from_text,
