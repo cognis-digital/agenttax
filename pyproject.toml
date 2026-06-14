@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "cognis-agenttax"
-version = "0.1.0"
+version = "0.1.1"
 description = "Classify findings against Microsoft's AI-agent threat taxonomy with mitigations"
 authors = [{name = "Cognis Digital", email = "suite@cognis.digital"}]
 license = {text = "LicenseRef-COCL-1.0"}
@@ -21,6 +21,7 @@ classifiers = [
 dependencies = []
 
 [project.optional-dependencies]
+connect = ["cognis-connect @ git+https://github.com/cognis-digital/cognis-connect.git"]
 mcp = ["mcp>=1.0"]
 dev = ["pytest>=8.0"]
 
@@ -29,6 +30,7 @@ Homepage = "https://cognis.digital"
 Repository = "https://github.com/cognis-digital/agenttax"
 
 [project.scripts]
+"agenttax-emit" = "agenttax.connect:emit_main"
 agenttax = "agenttax.cli:main"
 
 [tool.hatch.build.targets.wheel]
