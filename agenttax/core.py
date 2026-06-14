@@ -374,9 +374,20 @@ def load_findings(path: str) -> List[Dict[str, Any]]:
     Accepts either a top-level list, or an object with a ``findings`` array.
     Each finding may use ``id``/``title``/``description``/``text``/``message``
     keys (flexible to match common scanner outputs).
+
+    Raises:
+        FileNotFoundError: if *path* does not exist.
+        FindingsError: if the file cannot be parsed or has unexpected structure.
     """
-    with open(path, "r", encoding="utf-8") as fh:
-        raw = fh.read()
+    try:
+        with open(path, "r", encoding="utf-8") as fh:
+            raw = fh.read()
+    except FileNotFoundError:
+        raise FileNotFoundError(f"findings file not found: {path}")
+    except OSError as exc:
+        raise FindingsError(f"cannot read {path}: {exc}") from exc
+    if not raw.strip():
+        raise FindingsError(f"findings file is empty: {path}")
     try:
         data = json.loads(raw)
     except json.JSONDecodeError as exc:
@@ -393,9 +404,13 @@ def normalize_findings(data: Any) -> List[Dict[str, Any]]:
     elif isinstance(data, list):
         items = data
     else:
-        raise FindingsError("findings root must be a JSON object or array")
+        raise FindingsError(
+            f"findings root must be a JSON object or array, got {type(data).__name__}"
+        )
     if not isinstance(items, list):
-        raise FindingsError("`findings` must be an array")
+        raise FindingsError(
+            f"`findings` key must be an array, got {type(items).__name__}"
+        )
 
     out: List[Dict[str, Any]] = []
     for idx, item in enumerate(items):
@@ -431,7 +446,13 @@ def findings_from_text(text: str) -> List[Dict[str, Any]]:
 # Classification
 # --------------------------------------------------------------------------
 def classify_text(text: str, min_confidence: float = 0.0) -> List[CategoryMatch]:
-    """Classify a single text blob against every taxonomy category."""
+    """Classify a single text blob against every taxonomy category.
+
+    *text* is coerced to ``str`` so callers that pass ``None`` or other types
+    get an empty-but-valid result rather than a ``TypeError``.
+    """
+    if not isinstance(text, str):
+        text = "" if text is None else str(text)
     matches: List[CategoryMatch] = []
     for cat in TAXONOMY:
         raw = 0.0
@@ -476,7 +497,14 @@ def classify_findings(findings: List[Dict[str, Any]], source: str = "<findings>"
 
 # Convenience alias mirroring the suite's common `scan` entry point.
 def scan(target: str, min_confidence: float = 0.0) -> Dict[str, Any]:
-    """Classify findings from a file path (suite-standard scan entry point)."""
+    """Classify findings from a file path (suite-standard scan entry point).
+
+    Raises:
+        FileNotFoundError: if *target* does not exist.
+        FindingsError: if the file cannot be parsed or has unexpected structure.
+    """
+    if not target or not isinstance(target, str):
+        raise ValueError(f"scan: target must be a non-empty string, got {target!r}")
     findings = load_findings(target)
     report = classify_findings(findings, source=target, min_confidence=min_confidence)
     return report.to_dict()

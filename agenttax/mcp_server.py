@@ -31,12 +31,22 @@ from agenttax.core import (
 def _classify_payload(arguments: Dict[str, Any]) -> Dict[str, Any]:
     text = arguments.get("text")
     findings_arg = arguments.get("findings")
-    min_conf = float(arguments.get("min_confidence", 0.0) or 0.0)
+
+    raw_conf = arguments.get("min_confidence", 0.0)
+    try:
+        min_conf = float(raw_conf if raw_conf is not None else 0.0)
+    except (TypeError, ValueError):
+        return {"error": f"min_confidence must be a number, got {raw_conf!r}"}
+    min_conf = max(0.0, min(1.0, min_conf))
+
     if text:
         findings = findings_from_text(str(text))
         source = "<text>"
     elif findings_arg is not None:
-        findings = normalize_findings(findings_arg)
+        try:
+            findings = normalize_findings(findings_arg)
+        except Exception as exc:
+            return {"error": f"invalid findings: {exc}"}
         source = "<findings>"
     else:
         return {"error": "provide 'text' or 'findings'"}
@@ -95,7 +105,8 @@ def _serve_stdio() -> None:
              "error": {"code": code, "message": message}}) + "\n")
         sys.stdout.flush()
 
-    for line in sys.stdin:
+    try:
+      for line in sys.stdin:
         line = line.strip()
         if not line:
             continue
@@ -103,6 +114,10 @@ def _serve_stdio() -> None:
             req = json.loads(line)
         except json.JSONDecodeError:
             err(None, -32700, "parse error")
+            continue
+
+        if not isinstance(req, dict):
+            err(None, -32600, "request must be a JSON object")
             continue
 
         method = req.get("method")
@@ -137,6 +152,8 @@ def _serve_stdio() -> None:
         else:
             if rid is not None:
                 err(rid, -32601, f"method not found: {method}")
+    except BrokenPipeError:
+        pass  # client disconnected cleanly
 
 
 def run_mcp_server() -> None:

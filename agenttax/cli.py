@@ -110,8 +110,12 @@ def _build_parser() -> argparse.ArgumentParser:
 
 def _emit(text: str, out: Optional[str]) -> None:
     if out:
-        with open(out, "w", encoding="utf-8") as fh:
-            fh.write(text + "\n")
+        try:
+            with open(out, "w", encoding="utf-8") as fh:
+                fh.write(text + "\n")
+        except OSError as exc:
+            print(f"error: cannot write to {out!r}: {exc}", file=sys.stderr)
+            raise
     else:
         print(text)
 
@@ -134,6 +138,9 @@ def _run_classify(args: argparse.Namespace) -> int:
     elif args.findings:
         try:
             findings = load_findings(args.findings)
+        except FileNotFoundError as exc:
+            print(f"error: {exc}", file=sys.stderr)
+            return 2
         except (OSError, FindingsError) as exc:
             print(f"error: {exc}", file=sys.stderr)
             return 2
@@ -142,7 +149,14 @@ def _run_classify(args: argparse.Namespace) -> int:
         print("error: provide a findings file or --text", file=sys.stderr)
         return 2
 
-    mc = max(0.0, min(1.0, args.min_confidence))
+    raw_mc = args.min_confidence
+    mc = max(0.0, min(1.0, raw_mc))
+    if raw_mc != mc:
+        print(
+            f"warning: --min-confidence {raw_mc} clamped to {mc}",
+            file=sys.stderr,
+        )
+
     report = classify_findings(findings, source=source, min_confidence=mc)
 
     if args.format == "json":
@@ -151,7 +165,11 @@ def _run_classify(args: argparse.Namespace) -> int:
         out = json.dumps(to_sarif(report), indent=2)
     else:
         out = _render_table(report)
-    _emit(out, args.out)
+
+    try:
+        _emit(out, args.out)
+    except OSError:
+        return 2
 
     return 1 if _fail_triggered(report, args.fail_on) else 0
 
@@ -159,11 +177,18 @@ def _run_classify(args: argparse.Namespace) -> int:
 def main(argv: Optional[List[str]] = None) -> int:
     parser = _build_parser()
     args = parser.parse_args(argv)
-    if args.command == "classify":
-        return _run_classify(args)
-    if args.command == "taxonomy":
-        print(_render_taxonomy())
-        return 0
+    try:
+        if args.command == "classify":
+            return _run_classify(args)
+        if args.command == "taxonomy":
+            print(_render_taxonomy())
+            return 0
+    except KeyboardInterrupt:
+        print("interrupted", file=sys.stderr)
+        return 130
+    except Exception as exc:  # pragma: no cover — last-resort guard
+        print(f"internal error: {exc}", file=sys.stderr)
+        return 2
     parser.print_help(sys.stderr)
     return 2
 
