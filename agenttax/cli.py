@@ -16,6 +16,7 @@ from .core import (
     findings_from_text,
     get_taxonomy,
     load_findings,
+    to_csv,
     to_sarif,
 )
 
@@ -94,7 +95,7 @@ def _build_parser() -> argparse.ArgumentParser:
     cls.add_argument("--text",
                      help="Classify this free-text blob instead of a file "
                           "(one finding per paragraph/line).")
-    cls.add_argument("--format", choices=("table", "json", "sarif"),
+    cls.add_argument("--format", choices=("table", "json", "sarif", "csv"),
                      default="table", help="Output format (default: table).")
     cls.add_argument("--min-confidence", type=float, default=0.0,
                      help="Drop category matches below this confidence (0.0-1.0).")
@@ -149,6 +150,8 @@ def _run_classify(args: argparse.Namespace) -> int:
         out = json.dumps(report.to_dict(), indent=2)
     elif args.format == "sarif":
         out = json.dumps(to_sarif(report), indent=2)
+    elif args.format == "csv":
+        out = to_csv(report)
     else:
         out = _render_table(report)
     _emit(out, args.out)

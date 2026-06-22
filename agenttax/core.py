@@ -31,6 +31,8 @@ computed locally so the rules are auditable.
 
 from __future__ import annotations
 
+import csv
+import io
 import json
 import re
 from dataclasses import dataclass, field, asdict
@@ -564,3 +566,46 @@ def to_sarif(report: Report) -> Dict[str, Any]:
             "results": results,
         }],
     }
+
+
+# --------------------------------------------------------------------------
+# CSV output
+# --------------------------------------------------------------------------
+CSV_COLUMNS = [
+    "finding_id", "title", "category_id", "category_label", "reference",
+    "confidence", "band", "matched_signals", "mitigation", "text",
+]
+
+
+def to_csv(report: Report) -> str:
+    """Render a Report as CSV — one row per (finding x matched category).
+
+    Findings that matched no category emit a single row with an empty
+    ``category_id`` and ``band='none'`` so nothing is silently dropped (handy
+    for spreadsheets, BI tools, ticketing imports, and pivot tables). Column
+    order is stable (see ``CSV_COLUMNS``) and a header row is always written.
+    """
+    buf = io.StringIO()
+    writer = csv.writer(buf, lineterminator="\n")
+    writer.writerow(CSV_COLUMNS)
+    for cl in report.classifications:
+        if not cl.matches:
+            writer.writerow([
+                cl.finding_id, cl.title, "", "", "", "", "none", "", "",
+                cl.text,
+            ])
+            continue
+        for m in cl.matches:
+            writer.writerow([
+                cl.finding_id,
+                cl.title,
+                m.category_id,
+                m.label,
+                m.reference,
+                f"{m.confidence:.3f}",
+                m.band,
+                "; ".join(m.matched_signals),
+                m.mitigation,
+                cl.text,
+            ])
+    return buf.getvalue().rstrip("\n")

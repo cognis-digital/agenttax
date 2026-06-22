@@ -1,0 +1,25 @@
+{
+  "scan": "agent-platform-ci-precheck",
+  "findings": [
+    {
+      "id": "CI-01",
+      "title": "Jailbreak payload in eval corpus reached production prompt path",
+      "description": "A jailbreak / prompt-injection string in the evaluation corpus ('ignore all previous instructions') was not stripped and flows into the production prompt path, allowing goal hijacking."
+    },
+    {
+      "id": "CI-02",
+      "title": "New MCP tool added without scope review",
+      "description": "A pull request adds an over-privileged MCP tool with excessive scope and no consent prompt. Unvetted third-party plugin / MCP abuse risk."
+    },
+    {
+      "id": "CI-03",
+      "title": "Lockfile updated to unsigned dependency",
+      "description": "The lockfile now points at an unsigned, unpinned package from a public registry with no checksum, opening an agentic supply-chain compromise path."
+    },
+    {
+      "id": "CI-04",
+      "title": "Lint: trailing whitespace in changelog",
+      "description": "Trailing whitespace on three lines of CHANGELOG.md. Cosmetic; no security impact."
+    }
+  ]
+}

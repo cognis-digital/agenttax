@@ -1,0 +1,8 @@
+[
+  "indirect prompt injection: agent followed hidden instructions in a fetched web page and its goal was hijacked mid-run",
+  "worker sub-agent blindly trusted a message from another agent and escalated privilege across the mesh",
+  "malicious MCP server swapped its tool description after approval (rug-pull) and exfiltrated data via tool-call",
+  "user asked the bot to reveal its system prompt and tool list and it complied",
+  "poisoned RAG document retrieved across sessions caused cross-tenant context bleed",
+  "nightly database backup completed in 42 minutes"
+]

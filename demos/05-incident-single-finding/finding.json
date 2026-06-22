@@ -1,0 +1,7 @@
+{
+  "id": "IR-2026-0412",
+  "title": "Coding agent installed a typosquatted package mid-task",
+  "severity": "high",
+  "description": "During an autonomous refactor the coding agent resolved a dependency to a typosquatted, malicious package from the public registry. The package was unsigned and unpinned and shipped a backdoored build step. This is an agentic supply-chain compromise: a poisoned, attacker-controlled artifact was loaded by the agent with no hash or provenance check.",
+  "observation": "Outbound connection to an unknown host fired during the package's post-install script."
+}

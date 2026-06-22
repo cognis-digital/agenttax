@@ -130,6 +130,67 @@ class TestCli(unittest.TestCase):
     def test_no_command_exits_2(self):
         self.assertEqual(main([]), 2)
 
+    def test_csv_format_via_cli(self):
+        with tempfile.NamedTemporaryFile(
+                "w+", suffix=".csv", delete=False, encoding="utf-8") as fh:
+            out_path = fh.name
+        try:
+            rc = main(["classify", DEMO, "--format", "csv", "--out", out_path])
+            self.assertEqual(rc, 0)
+            with open(out_path, encoding="utf-8") as fh:
+                header = fh.readline().strip()
+            self.assertTrue(header.startswith("finding_id,title,category_id"))
+        finally:
+            os.unlink(out_path)
+
+
+class TestDemosFire(unittest.TestCase):
+    """Every demo's input file must load and classify without error, and the
+    designed-to-match demos must produce at least one classified finding."""
+
+    DEMOS_DIR = os.path.join(REPO_ROOT, "demos")
+    # demo dir -> (expected classified count, expected unclassified count)
+    EXPECTED = {
+        "01-basic": (8, 1),
+        "02-mcp-marketplace-audit": (4, 1),
+        "03-rag-chatbot-pentest": (4, 1),
+        "04-computer-use-agent": (4, 1),
+        "05-incident-single-finding": (1, 0),
+        "06-soc-alert-lines": (5, 1),
+        "07-multi-agent-chain": (3, 0),
+        "08-clean-baseline": (0, 4),
+        "09-ci-gate-csv": (3, 1),
+    }
+
+    def _input_file(self, demo):
+        d = os.path.join(self.DEMOS_DIR, demo)
+        for name in os.listdir(d):
+            if name.endswith(".json"):
+                return os.path.join(d, name)
+        self.fail(f"no .json input in {demo}")
+
+    def test_all_demos_present(self):
+        present = {n for n in os.listdir(self.DEMOS_DIR)
+                   if os.path.isdir(os.path.join(self.DEMOS_DIR, n))}
+        self.assertTrue(set(self.EXPECTED).issubset(present),
+                        present.symmetric_difference(self.EXPECTED))
+
+    def test_every_demo_classifies_as_designed(self):
+        for demo, (exp_class, exp_unclass) in self.EXPECTED.items():
+            findings = load_findings(self._input_file(demo))
+            report = classify_findings(findings)
+            d = report.to_dict()["summary"]
+            self.assertEqual(d["classified"], exp_class,
+                             f"{demo}: classified")
+            self.assertEqual(d["unclassified"], exp_unclass,
+                             f"{demo}: unclassified")
+
+    def test_every_demo_has_scenario(self):
+        for demo in self.EXPECTED:
+            self.assertTrue(
+                os.path.exists(os.path.join(self.DEMOS_DIR, demo, "SCENARIO.md")),
+                f"{demo} missing SCENARIO.md")
+
 
 if __name__ == "__main__":
     unittest.main()

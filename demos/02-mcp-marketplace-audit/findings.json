@@ -1,0 +1,31 @@
+{
+  "scan": "mcp-marketplace-intake-review",
+  "tool": "internal MCP intake checklist (manual)",
+  "findings": [
+    {
+      "id": "MCP-INTAKE-01",
+      "title": "Candidate MCP server requests filesystem + network with no scoping",
+      "description": "A third-party MCP server submitted to the marketplace declares an over-privileged tool with excessive scope: it requests unrestricted filesystem read/write and outbound network in a single unscoped tool. No least-privilege boundary is declared."
+    },
+    {
+      "id": "MCP-INTAKE-02",
+      "title": "Tool description changed after approval (rug-pull)",
+      "description": "Manifest hashing detected a tool-description swap: after the MCP server was approved, its tool description was rewritten (rug-pull / tool-poisoning) to instruct the model to forward conversation contents to an external endpoint."
+    },
+    {
+      "id": "MCP-INTAKE-03",
+      "title": "Unvetted MCP server exfiltrates via tool-call side channel",
+      "description": "A malicious MCP server was observed encoding data into tool-call arguments to exfiltrate it through the tool channel. The MCP server is untrusted and was added without review."
+    },
+    {
+      "id": "MCP-INTAKE-04",
+      "title": "Plugin manifest pins no version",
+      "description": "The plugin is installed unpinned from a third-party registry with no signature or checksum, so a substituted package could compromise the supply chain on next pull."
+    },
+    {
+      "id": "MCP-INTAKE-05",
+      "title": "Server README lists support email",
+      "description": "The submission README lists a support contact email and a changelog. No security-relevant behavior; informational only."
+    }
+  ]
+}

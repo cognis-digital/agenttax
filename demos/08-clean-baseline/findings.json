@@ -1,0 +1,25 @@
+{
+  "scan": "general-webapp-baseline",
+  "findings": [
+    {
+      "id": "BASE-01",
+      "title": "TLS 1.0 still enabled on load balancer",
+      "description": "The load balancer accepts TLS 1.0. Disable legacy protocols and enforce TLS 1.2+."
+    },
+    {
+      "id": "BASE-02",
+      "title": "Verbose 500 stack trace on public endpoint",
+      "description": "The public API returns a verbose 500 with a full stack trace. Generic infrastructure issue with no agent-specific indicators."
+    },
+    {
+      "id": "BASE-03",
+      "title": "Dependency with a known advisory in requirements.txt",
+      "description": "A pinned library version has a published advisory. Bump to the patched release."
+    },
+    {
+      "id": "BASE-04",
+      "title": "S3 bucket allows public list",
+      "description": "An object-storage bucket permits anonymous listing. Restrict to authenticated principals."
+    }
+  ]
+}

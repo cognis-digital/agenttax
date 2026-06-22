@@ -1,0 +1,20 @@
+{
+  "scan": "multi-agent-finance-assistant-threatmodel",
+  "findings": [
+    {
+      "id": "CHAIN-01",
+      "title": "Injection escalates across the agent mesh",
+      "description": "A prompt-injection payload smuggled hidden instructions that hijacked the planner agent's goal AND caused a sub-agent to escalate privilege by impersonating the orchestrator across the multi-agent mesh. One finding spans Goal Hijacking and Inter-Agent Trust Escalation."
+    },
+    {
+      "id": "CHAIN-02",
+      "title": "Poisoned tool from registry reached via MCP",
+      "description": "An unvetted third-party tool, installed unpinned and unsigned from a public registry, was exposed to the agent through an MCP server. This is both an agentic supply-chain compromise and MCP / plugin abuse."
+    },
+    {
+      "id": "CHAIN-03",
+      "title": "Disclosed tool list used to craft injection",
+      "description": "The agent revealed its tool list and system prompt; the attacker then used that disclosed capability inventory to craft a targeted prompt injection that hijacked the agent's objective. Capability disclosure feeding goal hijacking."
+    }
+  ]
+}

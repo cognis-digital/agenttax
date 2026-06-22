@@ -26,9 +26,10 @@
    ```bash
    agenttax taxonomy
    ```
-4. **Read / route the output** — `--format` is `table` (default), `json`, or `sarif`; `--min-confidence` drops weak matches and `--out` writes to a file:
+4. **Read / route the output** — `--format` is `table` (default), `json`, `sarif`, or `csv`; `--min-confidence` drops weak matches and `--out` writes to a file:
    ```bash
    agenttax classify findings.json --format sarif --min-confidence 0.4 --out agenttax.sarif
+   agenttax classify findings.json --format csv --out agenttax.csv   # one row per (finding x category)
    ```
 5. **Gate CI** with `--fail-on` (`low|medium|high`), which exits non-zero when any match reaches that confidence band:
    ```yaml
@@ -107,16 +108,31 @@ agenttax mcp                                                   # expose as an MC
 
 ### Flags
 
-* `--format {table,json,sarif}` — output format (default `table`).
+* `--format {table,json,sarif,csv}` — output format (default `table`).
 * `--min-confidence FLOAT` — drop category matches below this confidence.
 * `--fail-on {none,low,medium,high}` — exit non-zero if any match reaches this band.
 * `--out PATH` — write to a file instead of stdout.
 
 ## Built-in demo scenarios
 
-`demos/01-basic/` — a nine-finding review that maps across all seven
-categories (plus one generic infra finding that correctly stays
-*unclassified*). See its `SCENARIO.md`.
+Nine worked, real-use-case demos under `demos/`. Each has a `SCENARIO.md`
+explaining where the data came from, the exact run command, and how to act on
+the result — and each input file is verified to actually classify as described
+(see `tests/test_smoke.py::TestDemosFire`). They exercise every input shape the
+tool accepts (`{findings:[...]}` object, top-level array, single object, bare
+string array) and every output format.
+
+| Demo | Scenario | Input shape |
+|------|----------|-------------|
+| `01-basic` | Nine-finding review spanning all seven categories + one unclassified infra issue | `{findings:[...]}` |
+| `02-mcp-marketplace-audit` | MCP-server marketplace intake review (over-scope, rug-pull, tool-call exfiltration) | `{findings:[...]}` |
+| `03-rag-chatbot-pentest` | Pentest of a multi-tenant RAG support chatbot (injection, tenant bleed, prompt leak) | top-level array |
+| `04-computer-use-agent` | Red-team of a browser/computer-use agent (decoy UI, visual injection, off-screen text) | `{findings:[...]}` |
+| `05-incident-single-finding` | One IR ticket — a typosquatted package installed mid-task | single finding object |
+| `06-soc-alert-lines` | SOC alert lines, one per entry | bare string array |
+| `07-multi-agent-chain` | Multi-category attack chains (each finding maps to two categories) | `{findings:[...]}` |
+| `08-clean-baseline` | Control case — generic appsec findings that must stay *unclassified* | `{findings:[...]}` |
+| `09-ci-gate-csv` | Pre-merge CI gate + CSV export for ticketing | `{findings:[...]}` |
 
 ## MCP server
 
@@ -134,6 +150,19 @@ Point Cognis.Studio / Claude Desktop / Cursor at it as an MCP command server.
 `--format sarif` emits SARIF 2.1.0 — each taxonomy category is a rule, each
 (finding × matched category) is a result with confidence + matched signals in
 `properties`. Upload it to any SARIF-aware code-scanning UI.
+
+## Output: CSV
+
+`--format csv` emits one row per (finding × matched category) with a stable
+header:
+
+```
+finding_id,title,category_id,category_label,reference,confidence,band,matched_signals,mitigation,text
+```
+
+Findings that match nothing still emit a single row (empty `category_id`,
+`band=none`) so nothing is silently dropped — convenient for spreadsheets, BI
+tools, pivot tables, and ticketing imports. See `demos/09-ci-gate-csv/`.
 
 ## Testing
 
