@@ -106,6 +106,10 @@ def _build_parser() -> argparse.ArgumentParser:
     cls.add_argument("--out", help="Write output to this file instead of stdout.")
 
     sub.add_parser("taxonomy", help="Print the full taxonomy + mitigations.")
+    sub.add_parser(
+        "mcp",
+        help="Run an MCP server over stdio exposing classify + taxonomy "
+             "(passive, offline, no network scanning).")
     return p
 
 
@@ -166,6 +170,10 @@ def main(argv: Optional[List[str]] = None) -> int:
         return _run_classify(args)
     if args.command == "taxonomy":
         print(_render_taxonomy())
+        return 0
+    if args.command == "mcp":
+        from .mcp_server import run_mcp_server
+        run_mcp_server()
         return 0
     parser.print_help(sys.stderr)
     return 2

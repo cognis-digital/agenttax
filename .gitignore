@@ -9,3 +9,12 @@ dist/
 venv/
 *.sarif
 .DS_Store
+
+# language ports
+node_modules/
+ports/node/dist/
+ports/node/out.json
+ports/go/agenttax
+ports/go/agenttax.exe
+ports/rust/target/
+Cargo.lock

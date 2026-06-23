@@ -1,0 +1,21 @@
+[package]
+name = "agenttax"
+version = "0.1.1"
+edition = "2021"
+description = "Rust port of AGENTTAX — classify findings against Microsoft's AI-agent threat taxonomy (passive, offline)."
+license = "LicenseRef-COCL-1.0"
+authors = ["Cognis Digital <dev@cognis.digital>"]
+
+[[bin]]
+name = "agenttax"
+path = "src/main.rs"
+
+[lib]
+name = "agenttax"
+path = "src/lib.rs"
+
+[dependencies]
+regex = "1"
+
+[profile.release]
+opt-level = 2
