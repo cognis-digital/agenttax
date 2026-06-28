@@ -1,0 +1,3 @@
+$ agenttax-emit --version
+
+agenttax 0.1.0

@@ -11,6 +11,66 @@
 
 *AI Security & Governance — securing LLMs, agents, and the MCP supply chain.*
 
+
+<!-- cognis:example:start -->
+## 🔎 Example output
+
+Real, reproducible output from the tool — runs offline:
+
+```console
+$ agenttax-emit --version
+agenttax 0.1.0
+```
+
+```console
+$ agenttax-emit --help
+usage: agenttax [-h] [--version] {classify,taxonomy,mcp} ...
+
+Classify security findings against Microsoft's AI-agent threat taxonomy and
+attach concrete mitigations.
+
+positional arguments:
+  {classify,taxonomy,mcp}
+    classify            Classify a findings JSON (or --text) into taxonomy
+                        categories.
+    taxonomy            Print the full taxonomy + mitigations.
+    mcp                 Run an MCP server over stdio exposing classify +
+                        taxonomy (passive, offline, no network scanning).
+
+options:
+  -h, --help            show this help message and exit
+  --version             show program's version number and exit
+```
+
+> Blocks above are real `agenttax` output — reproduce them from a clone.
+
+**Sample result format** _(illustrative values — run on your own data for real findings):_
+
+```
+{
+  "type": "indicator",
+  "id": "1234567890abcdef",
+  "name": "Suspicious DNS Query",
+  "description": "DNS query for suspicious domain",
+  "created_by": "AgentTax",
+  "created_at": "2023-02-15T14:30:00Z",
+  "modified_at": "2023-02-15T14:30:00Z",
+  "labels": ["suspicious", "dns"],
+  "observables": [
+    {
+      "type": "domain_name",
+      "value": "example.com"
+    },
+    {
+      "type": "ip_address",
+      "value": "192.0.2.1"
+    }
+  ]
+}
+```
+
+<!-- cognis:example:end -->
+
 ## Usage — step by step
 
 1. **Install** the `agenttax` command (stdlib-only — you can also just run it with Python 3.10+):

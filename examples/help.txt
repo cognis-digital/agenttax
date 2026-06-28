@@ -1,0 +1,18 @@
+$ agenttax-emit --help
+
+usage: agenttax [-h] [--version] {classify,taxonomy,mcp} ...
+
+Classify security findings against Microsoft's AI-agent threat taxonomy and
+attach concrete mitigations.
+
+positional arguments:
+  {classify,taxonomy,mcp}
+    classify            Classify a findings JSON (or --text) into taxonomy
+                        categories.
+    taxonomy            Print the full taxonomy + mitigations.
+    mcp                 Run an MCP server over stdio exposing classify +
+                        taxonomy (passive, offline, no network scanning).
+
+options:
+  -h, --help            show this help message and exit
+  --version             show program's version number and exit
